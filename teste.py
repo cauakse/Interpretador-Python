@@ -1,4 +1,6 @@
 def calcula(x ,y):
+   if(ola==oi):
+      return true
    return x+y
 
 
