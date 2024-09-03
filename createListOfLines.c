@@ -176,7 +176,6 @@ void exibe(List *l){
 
 int main (){
 	List *l=NULL;
-	
 	createListOfLines("teste.py",&l);
 	exibe(l);
 }
