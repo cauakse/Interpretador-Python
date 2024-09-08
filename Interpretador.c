@@ -90,14 +90,91 @@ int ProximaLinha (char token[30], FILE *arq, int Linha) {
 	return ProximaLinha(token,arq,Linha+1);
 }
 
+void createFunctionsList (Funcoes ** F, List *L){
+	Funcoes * aux, *ultimo;
+	*F=NULL;
+	while(L!=NULL){
+		if(strcmp(L->pToken->tokenName,"def")==0){
+			aux=(Funcoes*)malloc(sizeof(Funcoes));
+			L->pToken=L->pToken->prox;
+			strcpy(aux->nome,L->pToken->tokenName);
+			aux->inicio=L;
+			aux->prox=NULL;
+			if(*F==NULL)
+			{
+				*F=aux;
+				ultimo=*F;
+			}	
+			else
+			{
+				ultimo->prox=aux;
+				ultimo=aux;
+			}
+				
+			
+		}
+		L=L->prox;
+	}
+}
+
+int whatsIt(Token *T,Pilha *P,Funcoes *F){
+
+	while(P!=NULL && strcmp(P->conteudo.nomeVar,T->tokenName)!=0)
+		P=P->prox;
+	if(P!=NULL)
+		return 1; //busco uma variavel com o mesmo nome
+		
+	while(F!=NULL && strcmp(F->nome,T->tokenName)!=0)
+		F=F->prox;
+	if(F!=NULL)
+		return 2; //busco uma função com o mesmo nome
+
+	if(strcmp(T->tokenName,"if")==0||
+	strcmp(T->tokenName,"while")==0||
+	strcmp(T->tokenName,"for")==0||
+	strcmp(T->tokenName,"elif")==0||
+	strcmp(T->tokenName,"else")==0||
+	strcmp(T->tokenName,"do")==0||
+	strcmp(T->tokenName,"switch")==0)
+	return 3;//se for função do sistema
+	
+	return 10;//se for criação de variavel
+}
+
+void createNewVar(char nome[45],Pilha ** P){
+	Pilha *aux = (Pilha*)malloc(sizeof(Pilha));
+	aux->prox=*P;
+	aux->ant=NULL;
+	strcpy(aux->conteudo.nomeVar,nome);
+	aux->conteudo.val.flag=6;//DEIXANDO A VARIAVEL COM TIPO INDEFINIDO
+	if(*P!=NULL){
+		(*P)->ant=aux;	
+	}
+	else
+	{
+		aux->prox=NULL;
+	}
+	*P=aux;
+	
+	system("cls");
+	aux=*P;
+	while(aux!=NULL){
+		printf("Nome: %s\n",aux->conteudo.nomeVar);
+		aux=aux->prox;
+	}
+	getche();
+}
+
 void ExecPassos (List *L, FILE *arq) {
 	char op;
 	int LinhaAtual=0, qtdeL;
-
+	Token *atToken;
+	Pilha * pilhaDeVariaveis = NULL; //definindo a pilha de variaveis vazia
+	Funcoes * functions;
+	createFunctionsList(&functions,L);// listando todas as funcoes da lista
 	qtdeL = ContLinha(arq);
 	LimpaTela();
 	ExibirTexto((char*)"EXECUCAO DO PROGRAMA:",34,8,14);
-
 	do {
 		ExibirPrograma(arq,LinhaAtual);
 		LimpaMsg();
@@ -105,7 +182,30 @@ void ExecPassos (List *L, FILE *arq) {
 		printf("%d", LinhaAtual);
 		printf("EXECUTANDO %s", L->pToken->tokenName);
 
-		// Executa Linha de Código
+		//Executando os tokens
+		atToken=L->pToken;
+		switch(whatsIt(atToken,pilhaDeVariaveis,functions)){
+			case 1://caso for variavel ja definida
+				printf("opa");
+				break;
+			case 2://caso for função do cabra
+				printf("opa2");
+				break;
+			case 3://caso função do sistema
+				printf("opa3");
+				break;
+			case 4://caso for print
+				printf("opa4");
+				break;
+			case 5: //implementação futura
+				printf("opa5");
+				break;
+				
+			default: //se nao achou nada, então só pode ser criação de uma nova variavel
+			createNewVar(atToken->tokenName,&pilhaDeVariaveis);
+				
+		}
+		
 
 		op = getch();
 
