@@ -92,12 +92,13 @@ int ProximaLinha (char token[30], FILE *arq, int Linha) {
 
 void createFunctionsList (Funcoes ** F, List *L){
 	Funcoes * aux, *ultimo;
+	Token *tAux;
 	*F=NULL;
 	while(L!=NULL){
 		if(strcmp(L->pToken->tokenName,"def")==0){
 			aux=(Funcoes*)malloc(sizeof(Funcoes));
-			L->pToken=L->pToken->prox;
-			strcpy(aux->nome,L->pToken->tokenName);
+			tAux=L->pToken->prox;
+			strcpy(aux->nome,tAux->tokenName);
 			aux->inicio=L;
 			aux->prox=NULL;
 			if(*F==NULL)
@@ -118,6 +119,8 @@ void createFunctionsList (Funcoes ** F, List *L){
 }
 
 int whatsIt(Token *T,Pilha *P,Funcoes *F){
+	if(strcmp(T->tokenName,"def")==0)
+		return 0;
 
 	while(P!=NULL && strcmp(P->conteudo.nomeVar,T->tokenName)!=0)
 		P=P->prox;
@@ -200,13 +203,15 @@ void ExecPassos (List *L, FILE *arq) {
 			case 5: //implementação futura
 				printf("opa5");
 				break;
+			case 0://definição de função
+				
+				break;
 				
 			default: //se nao achou nada, então só pode ser criação de uma nova variavel
 			createNewVar(atToken->tokenName,&pilhaDeVariaveis);
 				
 		}
 		
-
 		op = getch();
 
 		switch(op) {
@@ -229,7 +234,8 @@ void ExecPassos (List *L, FILE *arq) {
 void AbrirArquivo (char arquivo[100], List **L) {
 	FILE *arq = fopen(arquivo,"r");
 	char op;
-
+	List *aux;
+	int i=0;
 	LimpaMsg();
 	if(arq == NULL)
 		EscrMsg((char*)"ARQUIVO NAO ENCONTRADO");
@@ -239,7 +245,6 @@ void AbrirArquivo (char arquivo[100], List **L) {
 		getch();
 
 		createListOfLines(arq, &(*L));
-
 		if(!L)
 			EscrMsg("ERRO");
 		else {

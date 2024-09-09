@@ -3,10 +3,8 @@ def calcula(x ,y):
       return true
    else:
       return false
-def cauateste (y,x):
-	alo=1;
-def outroteste (x,u)
-	alo2=2;
+def caua (x,y):
+   return true
 c = calcula(5,2)
 nome='c'
 nome2="igor guilherme"
