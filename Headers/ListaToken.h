@@ -1,6 +1,6 @@
 //Linhas de execução
 struct token {
-	char tokenName[45];
+	char tokenName[45], tokenText[100];
 	struct token *prox;
 };
 typedef struct token Token;
@@ -27,25 +27,25 @@ union vari {
 	//CASO A FLAG SEJA 6 SIGNIFICA QUE AINDA NAO POSSUI VALOR ATRIBUIDO
 };
 struct valor {
-    char flag;
-    union vari variavel;
+	char flag;
+	union vari variavel;
 };
 typedef struct valor Valor;
 
 struct conteudo {
-    char nomeVar[45];
-    Valor val;
+	char nomeVar[45];
+	Valor val;
 };
 typedef struct conteudo Conteudo;
 
 struct pilha {
-    struct pilha *prox, *ant;
-    Conteudo conteudo;
+	struct pilha *prox, *ant;
+	Conteudo conteudo;
 };
 typedef struct pilha Pilha;
 
 
-struct funcoes{
+struct funcoes {
 	char nome[45];
 	List *inicio;
 	struct funcoes *prox;
@@ -57,6 +57,7 @@ void createTokens(Token **pTokens, char string[100]) {
 	char aux[100];
 	Token *fim;
 	*pTokens = NULL;
+
 
 	while (i < strlen(string) - 1) {
 		j = 0;
@@ -71,6 +72,8 @@ void createTokens(Token **pTokens, char string[100]) {
 			if (*pTokens == NULL) {
 				*pTokens = (Token *) malloc(sizeof(Token));
 				(*pTokens)->prox = NULL;
+				if(strcmp(string,"fim") || strcmp(string,"fimdef"))
+					strcpy((*pTokens)->tokenText,string);
 				strcpy((*pTokens)->tokenName, aux);
 				fim = *pTokens;
 			} else {
@@ -83,8 +86,10 @@ void createTokens(Token **pTokens, char string[100]) {
 		if (string[i] != ' ' && string[i] != ',' && string[i] != ':' && string[i] != '\0' && i < strlen(string)) {
 			aux[0] = string[i];
 			aux[1] = '\0';
-			fim->prox = (Token *) malloc(sizeof(Token));
+			fim->prox = (Token*)malloc(sizeof(Token));
 			fim->prox->prox = NULL;
+			if(strcmp(string,"fim") || strcmp(string,"fimdef"))
+				strcpy((*pTokens)->tokenText,string);
 			strcpy(fim->prox->tokenName, aux);
 			fim = fim->prox;
 		}
@@ -97,14 +102,15 @@ void createListOfLines(FILE *ptr, List **lista) {
 	List *aux;
 	Desc desc;
 	int idenAnt = 0, idenAtu = 0, i;
-	char string[100];
-
-	rewind(ptr);
-
+	char string[100], def=0, func=0;
 
 	fgets(string, 100, ptr);
+	// Descobrindo se a linha é um def
+	if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' '))
+		def++;
+		
 	if (strlen(string) > 1) {
-		aux = (List *) malloc(sizeof(List));
+		aux = (List*)malloc(sizeof(List));
 		aux->prox = NULL;
 		aux->ant = NULL;
 		createTokens(&aux->pToken, string);
@@ -115,6 +121,12 @@ void createListOfLines(FILE *ptr, List **lista) {
 	fgets(string, 100, ptr);
 	while (!feof(ptr)) {
 		if (strlen(string) > 1) {
+
+			// Descobrindo se a linha é um def
+			if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' ')) {
+				def++;
+			}
+
 			i = 0;
 			idenAnt = idenAtu;
 			idenAtu = 0;
@@ -123,14 +135,26 @@ void createListOfLines(FILE *ptr, List **lista) {
 				i++;
 			}
 			if (idenAnt > idenAtu) {
-				aux = (List *) malloc(sizeof(List));
+				if(idenAtu != 0 || (idenAtu==0 && !def))
+					func++;
+				
+				aux = (List*)malloc(sizeof(List));
 				aux->prox = NULL;
 				aux->ant = desc.fim;
 				desc.fim->prox = aux;
 				desc.fim = aux;
-				createTokens(&aux->pToken, "fim");
+
+				if(func) {
+					func--;
+					createTokens(&aux->pToken,"fim");
+				} 
+				else {
+					def--;
+					createTokens(&aux->pToken,"fimdef");
+				}
+
 			}
-			aux = (List *) malloc(sizeof(List));
+			aux = (List*)malloc(sizeof(List));
 			aux->prox = NULL;
 			aux->ant = desc.fim;
 			desc.fim->prox = aux;
@@ -141,6 +165,7 @@ void createListOfLines(FILE *ptr, List **lista) {
 	}
 }
 
+// Função de Exibição dos Tokens para testes
 void exibe(List *l) {
 	int i = 0;
 	int j = 0;

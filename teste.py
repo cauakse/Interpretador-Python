@@ -1,10 +1,17 @@
-def calcula(x ,y):
-   if(ola==oi):
-      return true
-   else:
-      return false
-def caua (x,y):
-   return true
-c = calcula(5,2)
-nome='c'
-nome2="igor guilherme"
+def soma (x,y):
+   return x + y
+
+def fatorial (x):
+   fatorial = 1
+   for i in range(1,x+1):
+      fatorial *= i
+   return fatorial
+
+def exibe (frase):
+   print(frase)
+a = 2
+b = 3
+c = soma(a,b)
+print(c)
+if c>1:
+   print(fatorial(c))
