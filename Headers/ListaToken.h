@@ -11,11 +11,6 @@ struct list {
 };
 typedef struct list List;
 
-struct desc {
-	List *ini, *fim;
-};
-typedef struct desc Desc;
-
 //Pilha de variáveis
 union vari {
 	int in; //flag = 0
@@ -98,35 +93,32 @@ void createTokens(Token **pTokens, char string[100]) {
 	}
 }
 
-void createListOfLines(FILE *ptr, List **lista) {
-	List *aux;
-	Desc desc;
-	int idenAnt = 0, idenAtu = 0, i;
+void createListOfLines(FILE *arq, List **L) {
+	List *Aux, *Nova;
+	int idenAnt=0, idenAtu=0, i;
 	char string[100], def=0, func=0;
-
-	fgets(string, 100, ptr);
+	
+	/*rewind(arq);
+	
+	fgets(string, 100, arq);
 	// Descobrindo se a linha é um def
 	if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' '))
 		def++;
-		
+
 	if (strlen(string) > 1) {
-		aux = (List*)malloc(sizeof(List));
-		aux->prox = NULL;
-		aux->ant = NULL;
-		createTokens(&aux->pToken, string);
-		*lista = aux;
-		desc.ini = desc.fim = *lista;
-	}
+		Nova = (List*)malloc(sizeof(List));
+		Nova->prox = NULL;
+		Nova->ant = NULL;
+		createTokens(&Nova->pToken, string);
+		*L = Nova;
+	}*/
 
-	fgets(string, 100, ptr);
-	while (!feof(ptr)) {
-		if (strlen(string) > 1) {
-
+	fgets(string,100,arq);
+	while(!feof(arq)) {
+		if(strlen(string)>1) {
 			// Descobrindo se a linha é um def
-			if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' ')) {
+			if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' '))
 				def++;
-			}
-
 			i = 0;
 			idenAnt = idenAtu;
 			idenAtu = 0;
@@ -137,31 +129,43 @@ void createListOfLines(FILE *ptr, List **lista) {
 			if (idenAnt > idenAtu) {
 				if(idenAtu != 0 || (idenAtu==0 && !def))
 					func++;
-				
-				aux = (List*)malloc(sizeof(List));
-				aux->prox = NULL;
-				aux->ant = desc.fim;
-				desc.fim->prox = aux;
-				desc.fim = aux;
+
+				Nova = (List*)malloc(sizeof(List));
+				Nova->prox = NULL;
+				Nova->ant = NULL;
 
 				if(func) {
 					func--;
-					createTokens(&aux->pToken,"fim");
-				} 
-				else {
+					createTokens(&Nova->pToken,"fim");
+				} else {
 					def--;
-					createTokens(&aux->pToken,"fimdef");
+					createTokens(&Nova->pToken,"fimdef");
 				}
-
+				if(!L)
+					*L = Nova;
+				else {
+					Aux = *L;
+					while(Aux->prox)
+						Aux = Aux->prox;
+					Nova->ant = Aux;
+					Aux->prox = Nova;
+				}
 			}
-			aux = (List*)malloc(sizeof(List));
-			aux->prox = NULL;
-			aux->ant = desc.fim;
-			desc.fim->prox = aux;
-			desc.fim = aux;
-			createTokens(&aux->pToken, string);
+			Nova = (List*)malloc(sizeof(List));
+			Nova->prox = NULL;
+			Nova->ant = NULL;
+			createTokens(&Nova->pToken,string);
+			if(!(*L))
+				*L = Nova;
+			else {
+				Aux = *L;
+				while(Aux->prox)
+					Aux = Aux->prox;
+				Nova->ant = Aux;
+				Aux->prox = Nova;
+			}
 		}
-		fgets(string, 100, ptr);
+		fgets(string,100,arq);
 	}
 }
 

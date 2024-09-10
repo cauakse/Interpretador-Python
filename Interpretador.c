@@ -82,7 +82,7 @@ int ProximaLinha (char token[30], FILE *arq, int Linha) {
 void createFunctionsList (Funcoes **F, List *L) {
 	Funcoes * aux, *ultimo;
 	Token *tAux;
-	*F=NULL;
+	*F = NULL;
 	while(L!=NULL) {
 		if(strcmp(L->pToken->tokenName,"def")==0) {
 			aux=(Funcoes*)malloc(sizeof(Funcoes));
@@ -245,6 +245,7 @@ void AbrirArquivo (char arquivo[100], List **L) {
 		getch();
 
 		createListOfLines(arq, &(*L)); // Cria a lista de linhas do arquivo .py
+		fclose(arq);
 
 		if(!L)
 			EscrMsg((char*)"ERRO");

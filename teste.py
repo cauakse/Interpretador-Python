@@ -1,14 +1,11 @@
 def soma (x,y):
    return x + y
-
 def fatorial (x):
    fatorial = 1
    for i in range(1,x+1):
       fatorial *= i
    return fatorial
 
-def exibe (frase):
-   print(frase)
 a = 2
 b = 3
 c = soma(a,b)
