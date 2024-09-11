@@ -38,8 +38,16 @@ void RetiraCursor (void) {
 	SetConsoleCursorInfo(consoleHandle, &info);
 }
 
+void LigaCursor (void) {
+	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_CURSOR_INFO info;
+	info.dwSize = 100;
+	info.bVisible = TRUE;
+	SetConsoleCursorInfo(consoleHandle, &info);
+}
+
 void Dimensao (void) {
-	system("mode con cols=120 lines=45");
+	system("mode con cols=120 lines=145");
 }
 
 void Fundo (int Cor) {

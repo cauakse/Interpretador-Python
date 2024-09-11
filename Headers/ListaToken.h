@@ -21,6 +21,7 @@ union vari {
 	List *pont; //flag = 5
 	//CASO A FLAG SEJA 6 SIGNIFICA QUE AINDA NAO POSSUI VALOR ATRIBUIDO
 };
+
 struct valor {
 	char flag;
 	union vari variavel;
@@ -52,7 +53,6 @@ void createTokens(Token **pTokens, char string[100]) {
 	char aux[100];
 	Token *fim;
 	*pTokens = NULL;
-
 
 	while (i < strlen(string) - 1) {
 		j = 0;
@@ -88,7 +88,6 @@ void createTokens(Token **pTokens, char string[100]) {
 			strcpy(fim->prox->tokenName, aux);
 			fim = fim->prox;
 		}
-
 		i++;
 	}
 }
@@ -97,21 +96,6 @@ void createListOfLines(FILE *arq, List **L) {
 	List *Aux, *Nova;
 	int idenAnt=0, idenAtu=0, i;
 	char string[100], def=0, func=0;
-	
-	/*rewind(arq);
-	
-	fgets(string, 100, arq);
-	// Descobrindo se a linha é um def
-	if(strlen(string)>4 && (string[0] == 'd' && string[1] == 'e' && string[2] == 'f' && string[3] == ' '))
-		def++;
-
-	if (strlen(string) > 1) {
-		Nova = (List*)malloc(sizeof(List));
-		Nova->prox = NULL;
-		Nova->ant = NULL;
-		createTokens(&Nova->pToken, string);
-		*L = Nova;
-	}*/
 
 	fgets(string,100,arq);
 	while(!feof(arq)) {
@@ -128,27 +112,42 @@ void createListOfLines(FILE *arq, List **L) {
 			}
 			if (idenAnt > idenAtu) {
 				if(idenAtu != 0 || (idenAtu==0 && !def))
-					func++;
-
-				Nova = (List*)malloc(sizeof(List));
-				Nova->prox = NULL;
-				Nova->ant = NULL;
-
-				if(func) {
-					func--;
+					func = (idenAnt-idenAtu)/3;
+				else
+					if(idenAtu==0 && idenAnt>3)
+						func = (idenAnt-idenAtu)/3 - 1; // Menos um porque o último é o fimdef
+					
+				while(func) {
+					Nova = (List*)malloc(sizeof(List));
+					Nova->prox = NULL;
+					Nova->ant = NULL;
 					createTokens(&Nova->pToken,"fim");
-				} else {
-					def--;
-					createTokens(&Nova->pToken,"fimdef");
+					if(!L)
+						*L = Nova;
+					else {
+						Aux = *L;
+						while(Aux->prox)
+							Aux = Aux->prox;
+						Nova->ant = Aux;
+						Aux->prox = Nova;
+					}
+					func--;
 				}
-				if(!L)
-					*L = Nova;
-				else {
-					Aux = *L;
-					while(Aux->prox)
-						Aux = Aux->prox;
-					Nova->ant = Aux;
-					Aux->prox = Nova;
+				if(def && !idenAtu) {
+					Nova = (List*)malloc(sizeof(List));
+					Nova->prox = NULL;
+					Nova->ant = NULL;
+					createTokens(&Nova->pToken,"fimdef");
+					if(!L)
+						*L = Nova;
+					else {
+						Aux = *L;
+						while(Aux->prox)
+							Aux = Aux->prox;
+						Nova->ant = Aux;
+						Aux->prox = Nova;
+					}
+					def--;
 				}
 			}
 			Nova = (List*)malloc(sizeof(List));
@@ -174,6 +173,11 @@ void exibe(List *l) {
 	int i = 0;
 	int j = 0;
 	Token *p;
+
+	if(!l) {
+		printf("lista vazia");
+		getch();
+	}
 
 	while (l != NULL) {
 		printf("%d ", i);

@@ -44,44 +44,29 @@ void ConteudoArquivo(List *L) {
 	}
 }
 
-int ProximaLinha (char token[30], FILE *arq, int Linha) {
-	char linha[100], tokenArq[30];
-	int i=0,j;
-
-	rewind(arq);
-
-	//Encontrando a linha atual dentro do arquivo
-	fgets(linha,100,arq);
-	while(!feof(arq) && i<Linha) {
-		fgets(linha,100,arq);
-		i++;
+// Algoritmo recursivo para destruir os tokens
+void DestroiLinha(Token **Token) {
+	if(*Token) {
+		DestroiLinha(&(*Token)->prox);
+		free(*Token);
+		*Token = NULL;
 	}
+}
 
-	//Encontrando a primeira LETRA da linha
-	i=0;
-	while(i<strlen(linha) && !((linha[i] > 64 && linha[i] < 91) || (linha[i] > 96 && linha[i] < 123)))
-		i++;
-	j=0;
-	//Armazenando o primeiro token para comparacao
-	while ((i<strlen(linha)) &&
-	        ((linha[i] > 47 && linha[i] < 58) ||
-	         (((linha[i] > 64 && linha[i] < 91) ||
-	           (linha[i] > 96 && linha[i] < 123)))))
-		tokenArq[j++] = linha[i++];
-	tokenArq[j] = '\0';
-
-	LimpaMsg();
-	EscrMsg("");
-	printf("PTR: %s // ARQ: %s",token,tokenArq);
-
-	if(strcmp(token,tokenArq)==0)
-		return Linha;
-	return ProximaLinha(token,arq,Linha+1);
+// Algoritmo recursivo para destruir os elementos da lista
+void DestroiLista(List **L) {
+	if(*L) {
+		DestroiLinha(&(*L)->pToken);
+		DestroiLista(&(*L)->prox);
+		free(*L);
+		*L = NULL;
+	}
 }
 
 void createFunctionsList (Funcoes **F, List *L) {
 	Funcoes * aux, *ultimo;
 	Token *tAux;
+
 	*F = NULL;
 	while(L!=NULL) {
 		if(strcmp(L->pToken->tokenName,"def")==0) {
@@ -172,10 +157,10 @@ void ExecPassos (List *L) {
 		/*LimpaMsg();
 		EscrMsg("");
 		printf("%d", LinhaAtual);
-		printf("EXECUTANDO %s", L->pToken->tokenName);*/
+		printf("EXECUTANDO %s", L->pToken->tokenName);
 
 		//Executando os tokens
-		/*atToken=L->pToken;
+		atToken=L->pToken;
 		switch(whatsIt(atToken,pilhaDeVariaveis,functions)) {
 			case 1://caso for variavel ja definida
 				EscrMsg("opa");
@@ -231,24 +216,37 @@ void ExecPassos (List *L) {
 	} while(op!=27);
 }
 
-void AbrirArquivo (char arquivo[100], List **L) {
-	FILE *arq = fopen(arquivo,"r");
-	char op;
+void AbrirArquivo (List **L) {
+	FILE *arq;
+	char op, arquivo[100];
 	int i=0;
 
+	/*LigaCursor();
+	Moldura(40,10,90,16,9,0);
+	Moldura(41,11,89,13,9,0);
+	ExibirTexto((char*)"DIGITE O NOME DO ARQUIVO",53,12,14);
+	ExibirTexto((char*)"~ ",42,14,12);
+	textcolor(15);
+	gets(arquivo);
+	RetiraCursor();
+
+	arq = fopen(arquivo,"r");*/
+	arq = fopen("teste2.py","r");
+
 	LimpaMsg();
-	if(arq == NULL)
+	if(!arq) {
 		EscrMsg((char*)"ARQUIVO NAO ENCONTRADO");
-	else {
+		getch();
+	} else {
 		EscrMsg("");
 		printf("ARQUIVO %s ABERTO COM SUCESSO, PRESSIONE QUALQUER TECLA", arquivo);
 		getch();
 
 		createListOfLines(arq, &(*L)); // Cria a lista de linhas do arquivo .py
-		fclose(arq);
+		fclose(arq); //Fecha o arquivo e a partir daqui trabalha apenas com ponteiros
 
 		if(!L)
-			EscrMsg((char*)"ERRO");
+			EscrMsg((char*)"ERRO! ARQUIVO VAZIO");
 		else {
 			LimpaTela();
 			gotoxy(34,6);
@@ -267,14 +265,20 @@ void AbrirArquivo (char arquivo[100], List **L) {
 				if(op == 0) {
 					op = getch();
 					if(op == 66) {
-						ExecPassos((*L)); // Executa passo a passo do programa
+						ExecPassos(*L); // Executa passo a passo do programa
 						LimpaMsg();
 						EscrMsg((char*)"EXECUCAO FINALIZADA PRESSIONE [F8] PARA EXECUTAR NOVAMENTE OU [ESC] PARA SAIR");
 					}
+				} else if (op == 'x') {
+					clrscr();
+					exibe(*L);
+					getch();
 				}
 			} while(op != 27);
 		}
 	}
+	if(*L)
+		DestroiLista(&(*L));
 }
 
 void Menu (void) {
@@ -290,16 +294,17 @@ int main(void) {
 
 	SetConsoleTitle("Interpretador Python");
 	Dimensao();
-	RetiraCursor();
 	MolduraCompleta();
+	RetiraCursor();
 
 	do {
+		LimpaTelaInteira();
 		Menu();
 		op = getch();
 		if(op == 0) {
 			op = getch();
 			if(op == 65)
-				AbrirArquivo("teste.py",&L);
+				AbrirArquivo(&L);
 		}
 		LimpaTelaInteira();
 	} while(op!=27);
@@ -308,8 +313,6 @@ int main(void) {
 	LimpaTela();
 	LimpaMsg();
 	exibe(L);
-	//Teste de criação de Tokens
-
 	getch();
 
 	MoldFim();
