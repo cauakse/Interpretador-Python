@@ -3,11 +3,12 @@
 #include <string.h>
 #include <conio2.h>
 #include <windows.h>
+#include "Headers\\Mensagem.h"
 #include "Headers\\ListaToken.h"
 #include "Headers\\PilhaVar.h"
-#include "Headers\\Mensagem.h"
 #include "Headers\\Moldura.h"
 #include "Headers\\FuncoesPy.h"
+#include "Headers\\Funcoes.h"
 
 void ExibirPrograma(List *L, int LinhaAtual) {
 	int l=10, c=34;
@@ -19,7 +20,7 @@ void ExibirPrograma(List *L, int LinhaAtual) {
 		}
 		LimpaLinha(l);
 		gotoxy(c,l);
-		if(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
+		while(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
 			L = L->prox;
 		printf("%s",L->pToken->tokenText);
 		textbackground(0);
@@ -36,7 +37,7 @@ void ConteudoArquivo(List *L) {
 	while(L) {
 		gotoxy(c,l);
 
-		if(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
+		while(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
 			L = L->prox;
 		printf("%s",L->pToken->tokenText);
 		l++;
@@ -63,87 +64,60 @@ void DestroiLista(List **L) {
 	}
 }
 
-void createFunctionsList (Funcoes **F, List *L) {
-	Funcoes * aux, *ultimo;
-	Token *tAux;
+int PonteiroInicial (List **L) {
+	List *aux;
+	int Linha=0, contLinha=0;
 
-	*F = NULL;
-	while(L!=NULL) {
-		if(strcmp(L->pToken->tokenName,"def")==0) {
-			aux=(Funcoes*)malloc(sizeof(Funcoes));
-			tAux=L->pToken->prox;
-			strcpy(aux->nome,tAux->tokenName);
-			aux->inicio=L;
-			aux->prox=NULL;
-			if(*F==NULL) {
-				*F=aux;
-				ultimo=*F;
-			} else {
-				ultimo->prox=aux;
-				ultimo=aux;
-			}
+	aux = *L;
+	while(aux) {
+		if(!strcmp(aux->pToken->tokenName,"fimdef")) {
+			*L = aux;
+			Linha += contLinha;
+			contLinha = 0;
 		}
-		L=L->prox;
+		if(strcmp(aux->pToken->tokenName,"fimdef") && strcmp(aux->pToken->tokenName,"fim"))
+			contLinha++;
+		aux = aux->prox;
 	}
+	*L = (*L)->prox;
+	return Linha;
 }
 
-int whatsIt(Token *T,Pilha *P,Funcoes *F) {
-	if(strcmp(T->tokenName,"def")==0)
-		return 0;
+void Executa(Token *Token, Pilha **pVar, Funcoes *Funcoes) {
 
-	while(P!=NULL && strcmp(P->conteudo.nomeVar,T->tokenName)!=0)
-		P=P->prox;
-	if(P!=NULL)
-		return 1; // Busco uma variavel com o mesmo nome
-
-	while(F!=NULL && strcmp(F->nome,T->tokenName)!=0)
-		F=F->prox;
-	if(F!=NULL)
-		return 2; // Busco uma função com o mesmo nome
-
-	if(strcmp(T->tokenName,"if")==0 ||
-	        strcmp(T->tokenName,"while")==0 ||
-	        strcmp(T->tokenName,"for")==0 ||
-	        strcmp(T->tokenName,"elif")==0 ||
-	        strcmp(T->tokenName,"else")==0 ||
-	        strcmp(T->tokenName,"do")==0 ||
-	        strcmp(T->tokenName,"switch")==0)
-		return 3;// Se for função do sistema
-
-	return 10;// Se for criação de variavel
-}
-
-void createNewVar(char nome[45],Pilha ** P) {
-	Pilha *aux = (Pilha*)malloc(sizeof(Pilha));
-	aux->prox=*P;
-	aux->ant=NULL;
-	strcpy(aux->conteudo.nomeVar,nome);
-	aux->conteudo.val.flag=6;// Deixando a variável com tipo indefinido
-	if(*P!=NULL) {
-		(*P)->ant=aux;
-	} else {
-		aux->prox=NULL;
+	switch(whatsIt(Token,*pVar,Funcoes)) {
+		case 1://caso for variavel ja definida
+			EscrMsg("opa");
+			break;
+		case 2://caso for função do cabra
+			EscrMsg("opa2");
+			break;
+		case 3://caso função do sistema
+			EscrMsg("opa3");
+			break;
+		case 4://caso for print
+			EscrMsg("opa4");
+			break;
+		case 5: //implementação futura
+			EscrMsg("opa5");
+			break;
+		case 0://definição de função
+			break;
+		default: //se nao achou nada, então só pode ser criação de uma nova variavel
+			createNewVar(Token->tokenName,&(*pVar));
 	}
-	*P=aux;
-
-	system("cls");
-	aux=*P;
-	while(aux!=NULL) {
-		printf("Nome: %s\n",aux->conteudo.nomeVar);
-		aux=aux->prox;
-	}
-	getche();
+	// Após a criação das variáveis, executa-se a função correspondente armazenando seus resultados na pVar
 }
 
 void ExecPassos (List *L) {
 	char op;
-	int LinhaAtual=0;
+	int LinhaAtual = 0;
 	List *Linhas = L;
-	Token *atToken;
-	Pilha *pilhaDeVariaveis=NULL; // Definindo a pilha de variaveis vazia
+	Pilha *pilhaDeVariaveis = NULL; // Definindo a pilha de variaveis vazia
 	Funcoes *functions;
 
 	createFunctionsList(&functions,L);// Listando todas as funcoes da lista
+	LinhaAtual = PonteiroInicial(&L);
 
 	LimpaTela();
 	ExibirTexto((char*)"EXECUCAO DO PROGRAMA:",34,8,14);
@@ -153,35 +127,13 @@ void ExecPassos (List *L) {
 		LimpaMsg();
 		EscrMsg((char*)"[ENTER] - PROXIMA LINHA, [F9] - CONTEUDO MEM. RAM, [F10] - EXIBIR RESULTADOS OU [ESC] PARA VOLTAR");
 
+		Executa(L->pToken,&pilhaDeVariaveis,functions);// Executa a linha e atualiza a pilha de variáveis com resultados.
+
 		// Apenas para testar em qual Token o programa está passando durante o desenvolvimento
-		/*LimpaMsg();
+		LimpaMsg();
 		EscrMsg("");
 		printf("%d", LinhaAtual);
 		printf("EXECUTANDO %s", L->pToken->tokenName);
-
-		//Executando os tokens
-		atToken=L->pToken;
-		switch(whatsIt(atToken,pilhaDeVariaveis,functions)) {
-			case 1://caso for variavel ja definida
-				EscrMsg("opa");
-				break;
-			case 2://caso for função do cabra
-				EscrMsg("opa2");
-				break;
-			case 3://caso função do sistema
-				EscrMsg("opa3");
-				break;
-			case 4://caso for print
-				EscrMsg("opa4");
-				break;
-			case 5: //implementação futura
-				EscrMsg("opa5");
-				break;
-			case 0://definição de função
-				break;
-			default: //se nao achou nada, então só pode ser criação de uma nova variavel
-				createNewVar(atToken->tokenName,&pilhaDeVariaveis);
-		}*/
 
 		op = getch();
 
@@ -231,7 +183,7 @@ void AbrirArquivo (List **L) {
 	RetiraCursor();
 
 	arq = fopen(arquivo,"r");*/
-	arq = fopen("teste2.py","r");
+	arq = fopen("teste.py","r");
 
 	LimpaMsg();
 	if(!arq) {

@@ -11,43 +11,6 @@ struct list {
 };
 typedef struct list List;
 
-//Pilha de variáveis
-union vari {
-	int in; //flag = 0
-	float fl; //flag = 1
-	double db; //flag = 2
-	char ch; //flag = 3
-	char str[100]; //flag = 4
-	List *pont; //flag = 5
-	//CASO A FLAG SEJA 6 SIGNIFICA QUE AINDA NAO POSSUI VALOR ATRIBUIDO
-};
-
-struct valor {
-	char flag;
-	union vari variavel;
-};
-typedef struct valor Valor;
-
-struct conteudo {
-	char nomeVar[45];
-	Valor val;
-};
-typedef struct conteudo Conteudo;
-
-struct pilha {
-	struct pilha *prox, *ant;
-	Conteudo conteudo;
-};
-typedef struct pilha Pilha;
-
-
-struct funcoes {
-	char nome[45];
-	List *inicio;
-	struct funcoes *prox;
-};
-typedef struct funcoes Funcoes;
-
 void createTokens(Token **pTokens, char string[100]) {
 	int i = 0, j = 0;
 	char aux[100];
