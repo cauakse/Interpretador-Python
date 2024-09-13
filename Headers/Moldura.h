@@ -30,6 +30,38 @@ void Moldura (int CI,int LI,int CF,int LF,int CorT,int CorF) {
 	textcolor(15);
 }
 
+void MolduraFina (int CI,int LI,int CF,int LF,int CorT,int CorF) {
+	int i;
+
+	textcolor(CorT);
+	textbackground(CorF);
+
+	gotoxy(CI,LI);
+	printf("%c",218);
+	gotoxy(CF,LI);
+	printf("%c",191);
+	gotoxy(CI,LF);
+	printf("%c",192);
+	gotoxy(CF,LF);
+	printf("%c",217);
+
+	for(i=CI+1; i<CF; i++) {
+		gotoxy(i,LI);
+		printf("%c",196);
+		gotoxy(i,LF);
+		printf("%c",196);
+	}
+	for(i=LI+1; i<LF; i++) {
+		gotoxy(CI,i);
+		printf("%c",179);
+		gotoxy(CF,i);
+		printf("%c",179);
+	}
+
+	textbackground(0);
+	textcolor(15);
+}
+
 void RetiraCursor (void) {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO info;
@@ -62,15 +94,24 @@ void Fundo (int Cor) {
 }
 
 void LimpaLinha(int Num) {
-	gotoxy(32,Num);
-	printf("                                                                                       ");
+	gotoxy(3,Num);
+	printf("                                                                                                                    ");
 }
 
 void LimpaTela(void) {
 	int i;
 
-	for(i=8; i<41; i++)
+	for(i=10; i<41; i++)
 		LimpaLinha(i);
+}
+
+void LimpaTelaMem (void) {
+	int i;
+	
+	for(i=15;i<41;i++) {
+		gotoxy(46,i);
+		printf("                                                                        ");
+	}
 }
 
 void LimpaTelaInteira(void) {
@@ -83,8 +124,8 @@ void LimpaTelaInteira(void) {
 void MolduraCompleta (void) {
 	Moldura(1,1,120,45,9,0); // Moldura Externa
 	Moldura(2,2,119,4,9,0); // Moldura do Titulo
-	Moldura(2,5,30,41,9,0); // Moldura Lateral
-	Moldura(31,5,119,41,9,0); // Moldura Central
+	//Moldura(2,5,30,41,9,0); // Moldura Lateral (Não precisa de Menu)
+	Moldura(2,5,119,41,9,0); // Moldura Central
 	Moldura(2,42,119,44,9,0); // Moldura da Mensagem Inferior
 }
 

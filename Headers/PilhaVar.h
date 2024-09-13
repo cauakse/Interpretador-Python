@@ -27,25 +27,16 @@ struct pilha {
 };
 typedef struct pilha Pilha;
 
-void createNewVar(char nome[45],Pilha ** P) {
+void createNewVar(char nome[45],Pilha **P) {
 	Pilha *aux = (Pilha*)malloc(sizeof(Pilha));
 	aux->prox = *P;
 	aux->ant = NULL;
 	strcpy(aux->conteudo.nomeVar,nome);
 	aux->conteudo.val.flag = 6;// Deixando a variável com tipo indefinido
-	if(*P!=NULL) {
+	if(*P != NULL) {
 		(*P)->ant = aux;
 	} else {
 		aux->prox = NULL;
 	}
 	*P = aux;
-
-	system("cls");
-	
-	aux=*P;
-	while(aux!=NULL) {
-		printf("Nome: %s\n",aux->conteudo.nomeVar);
-		aux=aux->prox;
-	}
-	getch();
 }

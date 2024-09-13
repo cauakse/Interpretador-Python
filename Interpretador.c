@@ -9,9 +9,10 @@
 #include "Headers\\Moldura.h"
 #include "Headers\\FuncoesPy.h"
 #include "Headers\\Funcoes.h"
+#include "Headers\\TADListaGen.h"
 
 void ExibirPrograma(List *L, int LinhaAtual) {
-	int l=10, c=34;
+	int l=10, c=6;
 
 	while(L) {
 		if(l==(LinhaAtual+10)) {
@@ -32,7 +33,7 @@ void ExibirPrograma(List *L, int LinhaAtual) {
 
 void ConteudoArquivo(List *L) {
 	char linha[100];
-	int l=10, c=34;
+	int l=10, c=6;
 
 	while(L) {
 		gotoxy(c,l);
@@ -109,6 +110,37 @@ void Executa(Token *Token, Pilha **pVar, Funcoes *Funcoes) {
 	// Após a criação das variáveis, executa-se a função correspondente armazenando seus resultados na pVar
 }
 
+void ExibirPilhaVar (Pilha *P) {
+	int c=46, l=38, end = 100;
+	
+	LimpaTelaMem();
+	Moldura(45,12,118,40,9,0);
+	Moldura(46,13,117,15,9,0);
+	ExibirTexto((char*)"PILHA DE VARIAVEIS",74,14,12);
+	for(l=16;l<40;l++)
+		ExibirTexto("       |                            |",c,l,9);
+	//	MolduraFina(46,l,117,l+2,9,0);
+	
+	gotoxy(48,16);
+	printf("END.");
+	
+	while(P->prox)
+		P = P->prox;
+	l=39;
+	c=48;
+	while(P) {
+		gotoxy(c,l);
+		printf("%d",end);
+		gotoxy(c+8,l);
+		printf("%s", P->conteudo.nomeVar);
+		gotoxy(c+36,l);
+		printf("%.d", P->conteudo.val);
+		l--;
+		end+=4;
+		P = P->ant;
+	}
+}
+
 void ExecPassos (List *L) {
 	char op;
 	int LinhaAtual = 0;
@@ -120,9 +152,10 @@ void ExecPassos (List *L) {
 	LinhaAtual = PonteiroInicial(&L);
 
 	LimpaTela();
-	ExibirTexto((char*)"EXECUCAO DO PROGRAMA:",34,8,14);
+	ExibirTexto((char*)"EXECUCAO DO PROGRAMA:",6,8,14);
 
 	do {
+		LimpaTela();
 		ExibirPrograma(Linhas,LinhaAtual); // Exibe o conteúdo do arquivo com efeito na linha atual .py
 		LimpaMsg();
 		EscrMsg((char*)"[ENTER] - PROXIMA LINHA, [F9] - CONTEUDO MEM. RAM, [F10] - EXIBIR RESULTADOS OU [ESC] PARA VOLTAR");
@@ -130,10 +163,10 @@ void ExecPassos (List *L) {
 		Executa(L->pToken,&pilhaDeVariaveis,functions);// Executa a linha e atualiza a pilha de variáveis com resultados.
 
 		// Apenas para testar em qual Token o programa está passando durante o desenvolvimento
-		LimpaMsg();
+		/*LimpaMsg();
 		EscrMsg("");
 		printf("%d", LinhaAtual);
-		printf("EXECUTANDO %s", L->pToken->tokenName);
+		printf("EXECUTANDO %s", L->pToken->tokenName);*/
 
 		op = getch();
 
@@ -143,6 +176,7 @@ void ExecPassos (List *L) {
 				switch(op) {
 					case 67:
 						LimpaMsg();
+						ExibirPilhaVar(pilhaDeVariaveis);
 						EscrMsg((char*)"CONTEUDO DA MEMORIA RAM");
 						getch();
 						break;
@@ -182,8 +216,8 @@ void AbrirArquivo (List **L) {
 	gets(arquivo);
 	RetiraCursor();
 
-	arq = fopen(arquivo,"r");*/
-	arq = fopen("teste.py","r");
+	arq = fopen(arquivo,"r");
+	*/arq = fopen("teste.py","r");
 
 	LimpaMsg();
 	if(!arq) {
@@ -201,11 +235,11 @@ void AbrirArquivo (List **L) {
 			EscrMsg((char*)"ERRO! ARQUIVO VAZIO");
 		else {
 			LimpaTela();
-			gotoxy(34,6);
+			gotoxy(6,6);
 			textcolor(12);
 			printf("%s",arquivo);
 			textcolor(15);
-			ExibirTexto((char*)"CONTEUDO DO ARQUIVO:",34,8,14);
+			ExibirTexto((char*)"CONTEUDO DO ARQUIVO:",6,8,14);
 
 			ConteudoArquivo(*L);
 
