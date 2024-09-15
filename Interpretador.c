@@ -123,6 +123,10 @@ void ExibirPilhaVar (Pilha *P) {
 	
 	gotoxy(48,16);
 	printf("END.");
+	gotoxy(56,16);
+	printf("VARIAVEL");
+	gotoxy(84,16);
+	printf("VALOR");
 	
 	while(P->prox)
 		P = P->prox;
@@ -216,7 +220,7 @@ void AbrirArquivo (List **L) {
 	gets(arquivo);
 	RetiraCursor();
 
-	arq = fopen(arquivo,"r");
+	/*arq = fopen(arquivo,"r");
 	*/arq = fopen("teste.py","r");
 
 	LimpaMsg();
