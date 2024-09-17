@@ -35,8 +35,6 @@ void createNewVar(char nome[45],Pilha **P) {
 	aux->conteudo.val.flag = 6;// Deixando a variável com tipo indefinido
 	if(*P != NULL) {
 		(*P)->ant = aux;
-	} else {
-		aux->prox = NULL;
 	}
 	*P = aux;
 }

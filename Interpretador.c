@@ -10,6 +10,7 @@
 #include "Headers\\FuncoesPy.h"
 #include "Headers\\Funcoes.h"
 #include "Headers\\TADListaGen.h"
+#include "Headers\\TadListaGenContas.h"
 
 void ExibirPrograma(List *L, int LinhaAtual) {
 	int l=10, c=6;
@@ -84,11 +85,28 @@ int PonteiroInicial (List **L) {
 	return Linha;
 }
 
-void Executa(Token *Token, Pilha **pVar, Funcoes *Funcoes) {
-
-	switch(whatsIt(Token,*pVar,Funcoes)) {
+void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
+	Pilha *P = *pVar;
+	Token *T;
+	char expressao[100];
+	expressao[0]='\0';
+	switch(whatsIt(Tok,*pVar,Funcoes)) {
 		case 1://caso for variavel ja definida
-			EscrMsg("opa");
+			P=*pVar;
+			if(Tok->prox!=NULL)
+			if(strcmp(Tok->prox->tokenName,"=")==0)
+			{
+				while(P!=NULL&& strcmp(P->conteudo.nomeVar,Tok->tokenName)!=0)
+					P=P->prox;
+				T=Tok->prox->prox;
+ 				while(T!=NULL){
+					strcat(expressao,T->tokenName);
+					T=T->prox;
+				}	
+				
+				P->conteudo.val.flag=1;
+				P->conteudo.val.variavel.fl=resolveExpressao(expressao);
+			}
 			break;
 		case 2://caso for função do cabra
 			EscrMsg("opa2");
@@ -105,7 +123,22 @@ void Executa(Token *Token, Pilha **pVar, Funcoes *Funcoes) {
 		case 0://definição de função
 			break;
 		default: //se nao achou nada, então só pode ser criação de uma nova variavel
-			createNewVar(Token->tokenName,&(*pVar));
+			createNewVar(Tok->tokenName,&(*pVar));
+			P=*pVar;
+			if(Tok->prox!=NULL)
+			if(strcmp(Tok->prox->tokenName,"=")==0)
+			{
+				while(P!=NULL&& strcmp(P->conteudo.nomeVar,Tok->tokenName)!=0)
+					P=P->prox;
+				T=Tok->prox->prox;
+ 				while(T!=NULL){
+					strcat(expressao,T->tokenName);
+					T=T->prox;
+				}	
+				
+				P->conteudo.val.flag=1;
+				P->conteudo.val.variavel.fl=resolveExpressao(expressao);
+			}
 	}
 	// Após a criação das variáveis, executa-se a função correspondente armazenando seus resultados na pVar
 }
@@ -138,7 +171,29 @@ void ExibirPilhaVar (Pilha *P) {
 		gotoxy(c+8,l);
 		printf("%s", P->conteudo.nomeVar);
 		gotoxy(c+36,l);
-		printf("%.d", P->conteudo.val);
+		switch(P->conteudo.val.flag){
+			case 0:
+				printf("%.d", P->conteudo.val.variavel.in);
+				break;
+			case 1:
+				printf("%f", P->conteudo.val.variavel.fl);
+				break;
+			case 2:
+				printf("%lf", P->conteudo.val.variavel.db);
+				break;
+			case 3:
+				printf("%c", P->conteudo.val.variavel.ch);
+				break;
+			case 4:
+				printf("%s", P->conteudo.val.variavel.str);
+				break;
+			case 5:
+				printf("%u", P->conteudo.val.variavel.pont);
+				break;
+			case 6:
+				printf("UNDEFINED");
+				break;
+		}
 		l--;
 		end+=4;
 		P = P->ant;
