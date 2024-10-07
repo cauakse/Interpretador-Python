@@ -19,7 +19,7 @@ void createTokens(Token **pTokens, char string[100]) {
 
 	while (i < strlen(string) - 1) {
 		j = 0;
-		while (string[i] != '+' && string[i] != '-' && string[i] != '*' && string[i] != '/' && string[i] != ' ' &&
+		while (string[i] != '+' && string[i]!='>' && string[i]!='<' && string[i] != '-' && string[i] != '*' && string[i] != '/' && string[i] != ' ' &&
 		        string[i] != '=' && string[i] != ':' && string[i] != '(' && string[i] != ')' && string[i] != ',' &&
 		        i < strlen(string) && string[i] != 39 && string[i] != '"') {
 			aux[j++] = string[i++];
