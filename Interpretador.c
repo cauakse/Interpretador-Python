@@ -127,7 +127,7 @@ void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 			break;
 		case 3://caso função do sistema
 			if(strcmp(Tok->tokenName,"if")==0)
-				resolveIf(Tok,*pVar);
+				resolveIf(Tok,pVar);
 			if(strcmp(Tok->tokenName,"while")==0)
 				break;
 			if(strcmp(Tok->tokenName,"for")==0)

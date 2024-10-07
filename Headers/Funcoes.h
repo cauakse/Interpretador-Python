@@ -55,10 +55,10 @@ void createFunctionsList (Funcoes **F, List *L) {
 	}
 }
 
-int resolveIf(Token *T,Pilha *P) {
-	Pilha * aux = P,*aux2=P;
+int resolveIf(Token *T, Pilha *P) {
+	Pilha *aux = P, *aux2=P;
 	int flag;
-	Token * prim,*seg,*terc;
+	Token *prim,*seg,*terc;
 	T=T->prox;
 	prim=T;
 	char op[3],valor[100];
@@ -88,7 +88,7 @@ int resolveIf(Token *T,Pilha *P) {
 			if(flag==3)
 				return aux->conteudo.val.variavel.ch > aux2->conteudo.val.variavel.ch;
 			if(flag==4)
-				return stcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) > 0;
+				return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) > 0;
 			else if(strcmp(op,"<")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
@@ -100,7 +100,7 @@ int resolveIf(Token *T,Pilha *P) {
 				if(flag==3)
 					return aux->conteudo.val.variavel.ch < aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return stcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) < 0;
+					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) < 0;
 			} else if(strcmp(op,">=")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
@@ -112,7 +112,7 @@ int resolveIf(Token *T,Pilha *P) {
 				if(flag==3)
 					return aux->conteudo.val.variavel.ch >= aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return stcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) >= 0;
+					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) >= 0;
 			} else if(strcmp(op,"<=")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
@@ -124,7 +124,7 @@ int resolveIf(Token *T,Pilha *P) {
 				if(flag==3)
 					return aux->conteudo.val.variavel.ch <= aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return stcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) <= 0;
+					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) <= 0;
 			} else if(strcmp(op,"==")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
@@ -136,7 +136,7 @@ int resolveIf(Token *T,Pilha *P) {
 				if(flag==3)
 					return aux->conteudo.val.variavel.ch == aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return stcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) == 0;
+					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) == 0;
 			}
 		}
 	} else {
@@ -297,7 +297,6 @@ int resolveIf(Token *T,Pilha *P) {
 			}
 		}
 	}
-
 }
 
 // Funcão de teste de exibição de funções

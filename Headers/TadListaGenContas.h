@@ -21,7 +21,7 @@ typedef struct tpTermo Termo;
 //-----------------------------------------------------------
 
 ListaGenC * criaNo(char termo[20]) {
-	ListaGenC *NC = (ListaGenC *)malloc(sizeof(ListaGenC));
+	ListaGenC *NC = (ListaGenC*)malloc(sizeof(ListaGenC));
 	NC->cauda=NC->cabeca=NULL;
 	if(termo[0]=='+'||termo[0]=='-'||termo[0]=='/'||termo[0]=='*') {
 		NC->terminal='O';
@@ -185,9 +185,9 @@ char isEmptyPCH(PilhaCH *P) {
 	return P==NULL;
 }
 
-void topoPCH(PilhaCH *P, char **V) {
+void topoPCH(PilhaCH *P, char *V) {
 	if(!isEmptyPCH(P))
-		strcpy(*V,P->valor);
+		strcpy(V,P->valor);
 }
 //-----------------------
 
@@ -273,7 +273,7 @@ float calcula(ListaGenC *L) {
 			pushPI(&PI,L->info.valor);
 		} else {
 			if(L->terminal=='O') {
-				topoPCH(PCH,&aux);
+				topoPCH(PCH,aux);
 				if(!isEmptyPCH(PCH)) {
 					if(strlen(aux)>1) {
 						popPI(&PI,&v1);
