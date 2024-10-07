@@ -33,8 +33,7 @@ void createNewVar(char nome[45],Pilha **P) {
 	aux->ant = NULL;
 	strcpy(aux->conteudo.nomeVar,nome);
 	aux->conteudo.val.flag = 6;// Deixando a variável com tipo indefinido
-	if(*P != NULL) {
+	if(*P)
 		(*P)->ant = aux;
-	}
 	*P = aux;
 }
