@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <conio2.h>
@@ -88,38 +89,51 @@ int PonteiroInicial (List **L) {
 void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 	Pilha *P = *pVar;
 	Token *T;
-	char expressao[100];
+	char expressao[100], string[100];
 	expressao[0]='\0';
 	switch(whatsIt(Tok,*pVar,Funcoes)) {
 		case 1://caso for variavel ja definida
 			P=*pVar;
-			if(Tok->prox!=NULL)
-			if(strcmp(Tok->prox->tokenName,"=")==0)
-			{
-				while(P!=NULL&& strcmp(P->conteudo.nomeVar,Tok->tokenName)!=0)
-					P=P->prox;
-				T=Tok->prox->prox;
- 				while(T!=NULL){
-					strcat(expressao,T->tokenName);
-					T=T->prox;
-				}	
-				
-				P->conteudo.val.flag=1;
-				P->conteudo.val.variavel.fl=resolveExpressao(expressao);
-			}
+			if(Tok->prox)
+				if(!strcmp(Tok->prox->tokenName,"=")) {
+					if(Tok->prox->prox->tokenName[0]>='0' && Tok->prox->prox->tokenName[0]<='9') {
+						while(P && strcmp(P->conteudo.nomeVar,Tok->tokenName))
+							P = P->prox;
+						T = Tok->prox->prox;
+						while(T) {
+							strcat(expressao,T->tokenName);
+							T = T->prox;
+						}
+
+						P->conteudo.val.flag = 1;
+						P->conteudo.val.variavel.fl=resolveExpressao(expressao);
+					} else {
+						P->conteudo.val.flag = 4;
+						strcpy(string,"");
+						Tok = Tok->prox->prox->prox;
+						strcat(string,Tok->tokenName);
+						Tok = Tok->prox;
+						while(Tok && (Tok->tokenName[0]!=39 && Tok->tokenName[0]!=34)) {
+							strcat(string," ");
+							strcat(string,Tok->tokenName);
+							Tok = Tok->prox;
+						}
+						strcpy(P->conteudo.val.variavel.str,string);
+					}
+				}
 			break;
 		case 2://caso for função do cabra
 			EscrMsg("opa2");
 			break;
-		case 3:
-				if(strcmp(Tok->tokenName,"if")==0)
-					resolveIf(Tok,*pVar);
-					
-				if(strcmp(Tok->tokenName,"while")==0)
-				if(strcmp(Tok->tokenName,"for")==0)
-				if(strcmp(Tok->tokenName,"do")==0)
-			
-			EscrMsg("opa3");
+		case 3://caso função do sistema
+			if(strcmp(Tok->tokenName,"if")==0)
+				resolveIf(Tok,*pVar);
+			if(strcmp(Tok->tokenName,"while")==0)
+				break;
+			if(strcmp(Tok->tokenName,"for")==0)
+				break;
+			if(strcmp(Tok->tokenName,"do")==0)
+				break;
 			break;
 		case 4://caso for print
 			EscrMsg("opa4");
@@ -133,41 +147,52 @@ void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 			createNewVar(Tok->tokenName,&(*pVar));
 			P=*pVar;
 			if(Tok->prox!=NULL)
-			if(strcmp(Tok->prox->tokenName,"=")==0)
-			{
-				while(P!=NULL&& strcmp(P->conteudo.nomeVar,Tok->tokenName)!=0)
-					P=P->prox;
-				T=Tok->prox->prox;
- 				while(T!=NULL){
-					strcat(expressao,T->tokenName);
-					T=T->prox;
-				}	
-				
-				P->conteudo.val.flag=1;
-				P->conteudo.val.variavel.fl=resolveExpressao(expressao);
-			}
+				if(strcmp(Tok->prox->tokenName,"=")==0) {
+					if(Tok->prox->prox->tokenName[0]>='0' && Tok->prox->prox->tokenName[0]<='9') {
+						while(P && strcmp(P->conteudo.nomeVar,Tok->tokenName))
+							P = P->prox;
+						T = Tok->prox->prox;
+						while(T) {
+							strcat(expressao,T->tokenName);
+							T = T->prox;
+						}
+
+						P->conteudo.val.flag=1;
+						P->conteudo.val.variavel.fl=resolveExpressao(expressao);
+					} else {
+						P->conteudo.val.flag = 4;
+						strcpy(string,"");
+						Tok = Tok->prox->prox->prox;
+						strcat(string,Tok->tokenName);
+						Tok = Tok->prox;
+						while(Tok && (Tok->tokenName[0]!=39 && Tok->tokenName[0]!=34)) {
+							strcat(string," ");
+							strcat(string,Tok->tokenName);
+							Tok = Tok->prox;
+						}
+						strcpy(P->conteudo.val.variavel.str,string);
+					}
+				}
 	}
 	// Após a criação das variáveis, executa-se a função correspondente armazenando seus resultados na pVar
 }
 
 void ExibirPilhaVar (Pilha *P) {
 	int c=46, l=38, end = 100;
-	
+
 	LimpaTelaMem();
 	Moldura(45,12,118,40,9,0);
 	Moldura(46,13,117,15,9,0);
 	ExibirTexto((char*)"PILHA DE VARIAVEIS",74,14,12);
-	for(l=16;l<40;l++)
+	for(l=16; l<40; l++)
 		ExibirTexto("       |                            |",c,l,9);
-	//	MolduraFina(46,l,117,l+2,9,0);
-	
 	gotoxy(48,16);
 	printf("END.");
 	gotoxy(56,16);
 	printf("VARIAVEL");
 	gotoxy(84,16);
 	printf("VALOR");
-	
+
 	while(P->prox)
 		P = P->prox;
 	l=39;
@@ -178,9 +203,9 @@ void ExibirPilhaVar (Pilha *P) {
 		gotoxy(c+8,l);
 		printf("%s", P->conteudo.nomeVar);
 		gotoxy(c+36,l);
-		switch(P->conteudo.val.flag){
+		switch(P->conteudo.val.flag) {
 			case 0:
-				printf("%.d", P->conteudo.val.variavel.in);
+				printf("%d", P->conteudo.val.variavel.in);
 				break;
 			case 1:
 				printf("%f", P->conteudo.val.variavel.fl);
@@ -202,8 +227,94 @@ void ExibirPilhaVar (Pilha *P) {
 				break;
 		}
 		l--;
-		end+=4;
+		end += 4;
 		P = P->ant;
+	}
+}
+
+Valor BuscaVariavel (Token *Var, Pilha *Pilha) {
+	Valor ValorVar;
+	ValorVar.flag = -1;
+	while(Pilha && ValorVar.flag == -1) {
+		if(!strcmp(Var->tokenName,Pilha->conteudo.nomeVar)) {
+			ValorVar.flag = Pilha->conteudo.val.flag;
+			ValorVar.variavel = Pilha->conteudo.val.variavel;
+		}
+		Pilha = Pilha->prox;
+	}
+	return ValorVar;
+}
+
+void ExibirPrint(Token *token, Pilha *pilhaVar) {
+	Valor val;
+	Token *var;
+	char string[100], aux[100], valor[10];
+
+	val.flag = -1;
+	strcpy(string,"");
+
+	if(strcmp(token->tokenName,"print"))
+		EscrMsg("A LINHA NAO CONTEM FUNCAO PRINT");
+	else {
+		token = token->prox;
+		if(token->tokenName[0] == '(') {
+			token = token->prox;
+			if(token->tokenName[0] == 34) {
+				token = token->prox;
+				while(token && token->tokenName[0]!=34) {
+					if(strcmp(token->tokenName,"%d") && strcmp(token->tokenName,"%f") && strcmp(token->tokenName,"%c") && strcmp(token->tokenName,"%s")) {
+						// Se não for uma máscara ele deve concatenar com a string a ser apresentada
+						strcpy(aux," ");
+						strcat(aux,token->tokenName);
+						strcat(string,aux);
+					} else {
+						// Caso encontre uma máscara ele deve procurar a variável e verificar sua existência.
+						if(val.flag == -1) {
+							var = token;
+							while(var && strcmp(var->tokenName,"%"))
+								var = var->prox;
+							if(var->prox->tokenName[0] == '(')
+								var = var->prox;
+							var = var->prox;
+							val = BuscaVariavel(var,pilhaVar);
+						} else {
+							var = var->prox;
+							val = BuscaVariavel(var,pilhaVar);
+						}
+						if(val.flag != -1) {
+							switch(token->tokenName[1]) {
+								case 'd': // Int
+									sprintf(valor," %.0f",val.variavel.fl);
+									break;
+								case 'f': // Float
+									sprintf(valor," %.6f",val.variavel.fl);
+									break;
+								case 2: // Double
+									sprintf(valor," %.6f",val.variavel.fl);
+									break;
+								case 'c': // Char
+									sprintf(valor," %d",val.variavel.fl);
+									break;
+								case 's': // String
+									strcpy(valor," ");
+									strcat(valor,val.variavel.str);
+							}
+							strcat(string,valor);
+						}
+
+					}
+					token = token->prox;
+				}
+			}
+		}
+		EscrMsg("");
+		Moldura(40,10,90,16,9,0);
+		Moldura(41,11,89,13,9,0);
+		ExibirTexto((char*)"RESULTADO DO PRINT",53,12,14);
+		gotoxy(42,14);
+		printf("%s",string);
+		textcolor(15);
+		getch();
 	}
 }
 
@@ -225,14 +336,7 @@ void ExecPassos (List *L) {
 		ExibirPrograma(Linhas,LinhaAtual); // Exibe o conteúdo do arquivo com efeito na linha atual .py
 		LimpaMsg();
 		EscrMsg((char*)"[ENTER] - PROXIMA LINHA, [F9] - CONTEUDO MEM. RAM, [F10] - EXIBIR RESULTADOS OU [ESC] PARA VOLTAR");
-
 		Executa(L->pToken,&pilhaDeVariaveis,functions);// Executa a linha e atualiza a pilha de variáveis com resultados.
-
-		// Apenas para testar em qual Token o programa está passando durante o desenvolvimento
-		/*LimpaMsg();
-		EscrMsg("");
-		printf("%d", LinhaAtual);
-		printf("EXECUTANDO %s", L->pToken->tokenName);*/
 
 		op = getch();
 
@@ -244,14 +348,13 @@ void ExecPassos (List *L) {
 						LimpaMsg();
 						ExibirPilhaVar(pilhaDeVariaveis);
 						EscrMsg((char*)"CONTEUDO DA MEMORIA RAM");
-						getch();
 						break;
 					case 68:
 						LimpaMsg();
+						ExibirPrint(L->pToken,pilhaDeVariaveis);
 						EscrMsg((char*)"EXIBICAO DOS RESULTADOS");
-						getch();
-						break;
 				}
+				getch();
 				break;
 			case 13: // Andando nas linhas do programa
 				if(L->prox) {
@@ -260,8 +363,6 @@ void ExecPassos (List *L) {
 					// Tokens que não são Linhas de Código.
 					if(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
 						L = L->prox;
-					//	if(L)
-					//		LinhaAtual = ProximaLinha(L->pToken->tokenName,arq,LinhaAtual+1);
 				} else
 					op=27;
 		}
@@ -294,8 +395,8 @@ void AbrirArquivo (List **L) {
 		printf("ARQUIVO %s ABERTO COM SUCESSO, PRESSIONE QUALQUER TECLA", arquivo);
 		getch();
 
-		createListOfLines(arq, &(*L)); // Cria a lista de linhas do arquivo .py
-		fclose(arq); //Fecha o arquivo e a partir daqui trabalha apenas com ponteiros
+		createListOfLines(arq, &(*L)); // Cria a lista de linhas do arquivo .py.
+		fclose(arq); //Fecha o arquivo e a partir daqui trabalha apenas com ponteiros.
 
 		if(!L)
 			EscrMsg((char*)"ERRO! ARQUIVO VAZIO");
