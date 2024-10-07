@@ -126,7 +126,14 @@ void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 			EscrMsg("opa2");
 			break;
 		case 3://caso função do sistema
-			EscrMsg("opa3");
+			if(strcmp(Tok->tokenName,"if")==0)
+				resolveIf(Tok,*pVar);
+			if(strcmp(Tok->tokenName,"while")==0)
+				break;
+			if(strcmp(Tok->tokenName,"for")==0)
+				break;
+			if(strcmp(Tok->tokenName,"do")==0)
+				break;
 			break;
 		case 4://caso for print
 			EscrMsg("opa4");
