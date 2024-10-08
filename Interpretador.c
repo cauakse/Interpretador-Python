@@ -319,17 +319,34 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 						var = var->prox;
 					}
 				}
+			} else {
+				var = token;
+				while(var && var->tokenName[0] != ')') {
+					if(var->tokenName[0] != ',' || var->tokenName[0] != '+') {
+						val = BuscaVariavel(var,pilhaVar);
+						if(val.flag != -1) {
+							if(val.flag == 1)
+								sprintf(valor," %.0f",val.variavel.fl);
+							else {
+								strcpy(valor," ");
+								strcat(valor,val.variavel.str);
+							}
+							strcat(string,valor);
+						}
+					}
+					var = var->prox;
+				}
 			}
+			EscrMsg("");
+			LimpaPrint();
+			Moldura(20,10,110,16,9,0);
+			Moldura(21,11,109,13,9,0);
+			ExibirTexto((char*)"RESULTADO DO PRINT",53,12,14);
+			gotoxy(22,14);
+			printf("%s",string);
+			textcolor(15);
+			getch();
 		}
-		EscrMsg("");
-		LimpaPrint();
-		Moldura(20,10,110,16,9,0);
-		Moldura(21,11,109,13,9,0);
-		ExibirTexto((char*)"RESULTADO DO PRINT",53,12,14);
-		gotoxy(22,14);
-		printf("%s",string);
-		textcolor(15);
-		getch();
 	}
 }
 
@@ -400,8 +417,6 @@ void ExecPassos (List *L) {
 						}
 					}
 					if(!strcmp(L->pToken->tokenName,"else")) {
-						printf("else");
-						getch();
 						if(ant) {
 							ant = NULL;
 							while(L && strcmp(L->pToken->tokenName,"fim")) {
@@ -509,12 +524,6 @@ int main(void) {
 		}
 		LimpaTelaInteira();
 	} while(op!=27);
-
-	//Teste de criação de Tokens
-	LimpaTela();
-	LimpaMsg();
-	exibe(L);
-	getch();
 
 	MoldFim();
 	MsgFim();
