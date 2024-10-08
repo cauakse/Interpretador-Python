@@ -248,7 +248,7 @@ Valor BuscaVariavel (Token *Var, Pilha *Pilha) {
 void ExibirPrint(Token *token, Pilha *pilhaVar) {
 	Valor val;
 	Token *var;
-	char string[100], aux[100], valor[10];
+	char string[100], aux[100], valor[10], mascara=0;
 
 	val.flag = -1;
 	strcpy(string,"");
@@ -259,9 +259,9 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 		token = token->prox;
 		if(token->tokenName[0] == '(') {
 			token = token->prox;
-			if(token->tokenName[0] == 34) {
+			if(token->tokenName[0] == 34 || token->tokenName[0] == 39) {
 				token = token->prox;
-				while(token && token->tokenName[0]!=34) {
+				while(token && (token->tokenName[0]!=34 && token->tokenName[0]!=39)) {
 					if(strcmp(token->tokenName,"%d") && strcmp(token->tokenName,"%f") && strcmp(token->tokenName,"%c") && strcmp(token->tokenName,"%s")) {
 						// Se não for uma máscara ele deve concatenar com a string a ser apresentada
 						strcpy(aux," ");
@@ -269,6 +269,7 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 						strcat(string,aux);
 					} else {
 						// Caso encontre uma máscara ele deve procurar a variável e verificar sua existência.
+						mascara = 1;
 						if(val.flag == -1) {
 							var = token;
 							while(var && strcmp(var->tokenName,"%"))
@@ -301,9 +302,28 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 							}
 							strcat(string,valor);
 						}
-
 					}
 					token = token->prox;
+				}
+				if(!mascara) {
+					var = token;
+					while(var && (var->tokenName[0] != 34 && var->tokenName[0] != 39))
+						var = var->prox;
+					while(var && var->tokenName[0] != ')') {
+						if(var->tokenName[0] != ',' || var->tokenName[0] != '+') {
+							val = BuscaVariavel(var,pilhaVar);
+							if(val.flag != -1) {
+								if(val.flag == 1)
+									sprintf(valor," %.0f",val.variavel.fl);
+								else {
+									strcpy(valor," ");
+									strcat(valor,val.variavel.str);
+								}
+								strcat(string,valor);
+							}
+						}
+						var = var->prox;
+					}
 				}
 			}
 		}
