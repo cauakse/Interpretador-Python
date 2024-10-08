@@ -12,10 +12,14 @@ nome = 'Matheus Oliveira da Silva'
 d = 2
 print("%d" % b)
 print("a = %d e c = %f" % (a,c))
-print('Meu nome e ',nome)
-print("Meu nome e ",nome,a,b,c)
-print("Meu nome e " + nome + a + b + c)
-print("Meu nome e Matheus")
-print("Meu nome e %s" % nome)
-if c>1:
-   print(fatorial(b))
+if b < 5:
+   print("b < 5")
+else:
+   print("b >= 5")
+print('Meu nome e',nome)
+print("Meu nome e",nome,a,b,c)
+if b >= 5:
+   print("Meu nome e" + nome)
+else:
+   print("Meu nome nao e" + nome)
+print("Fim do programa")

@@ -59,167 +59,186 @@ int resolveIf(Token *T, Pilha *P) {
 	Pilha *aux = P, *aux2=P;
 	int flag;
 	Token *prim,*seg,*terc;
-	T=T->prox;
+	T = T->prox;
 	prim=T;
-	char op[3],valor[100];
+	char op[3],valor[100],comp;
 
-	while(aux!=NULL && strcmp(T->tokenName,aux->conteudo.nomeVar)!=0)
-		aux=aux->prox;
+	aux = (Pilha*)malloc(sizeof(Pilha));
+	aux2 = (Pilha*)malloc(sizeof(Pilha));
+
+
+	if(prim->tokenName[0] >= '0' && prim->tokenName[0] >= '9') {
+		aux->conteudo.val.variavel.fl = atof(prim->tokenName);
+		aux->conteudo.val.flag = 1;
+	} else
+		while(aux!=NULL && strcmp(T->tokenName,aux->conteudo.nomeVar)!=0)
+			aux=aux->prox;
 
 	T=T->prox;
 	seg=T;
 	strcpy(op,T->tokenName);
+	if(T->prox->tokenName[0] == '=') {
+		T = T->prox;
+		strcat(op,T->tokenName);
+	}
 
-	while(aux2!=NULL && strcmp(T->tokenName,aux2->conteudo.nomeVar)!=0)
-		aux2=aux2->prox;
+	if(seg->tokenName[0] >= '0' && seg->tokenName[0] >= '9') {
+		aux2->conteudo.val.variavel.fl = atof(seg->tokenName);
+		aux2->conteudo.val.flag = 1;
+	} else
+		while(aux2 && strcmp(T->tokenName,aux2->conteudo.nomeVar)!=0)
+			aux2=aux2->prox;
 
 	T=T->prox;
 	terc=T;
+
+	if(aux->conteudo.val.flag == 0 || aux->conteudo.val.flag == 2)
+		aux->conteudo.val.flag = 1;
 
 	if(aux!=NULL && aux2!=NULL) {
 		if(strcmp(op,">")==0) {
 			flag = aux->conteudo.val.flag;
 			if(flag==0)
-				return aux->conteudo.val.variavel.in > aux2->conteudo.val.variavel.in;
+				comp =  aux->conteudo.val.variavel.in > aux2->conteudo.val.variavel.in;
 			if(flag==1)
-				return aux->conteudo.val.variavel.fl > aux2->conteudo.val.variavel.fl;
+				comp =  aux->conteudo.val.variavel.fl > aux2->conteudo.val.variavel.fl;
 			if(flag==2)
-				return aux->conteudo.val.variavel.db > aux2->conteudo.val.variavel.db;
+				comp =  aux->conteudo.val.variavel.db > aux2->conteudo.val.variavel.db;
 			if(flag==3)
-				return aux->conteudo.val.variavel.ch > aux2->conteudo.val.variavel.ch;
+				comp =  aux->conteudo.val.variavel.ch > aux2->conteudo.val.variavel.ch;
 			if(flag==4)
-				return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) > 0;
+				comp =  strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) > 0;
 			else if(strcmp(op,"<")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
-					return aux->conteudo.val.variavel.in < aux2->conteudo.val.variavel.in;
+					comp =  aux->conteudo.val.variavel.in < aux2->conteudo.val.variavel.in;
 				if(flag==1)
-					return aux->conteudo.val.variavel.fl < aux2->conteudo.val.variavel.fl;
+					comp =  aux->conteudo.val.variavel.fl < aux2->conteudo.val.variavel.fl;
 				if(flag==2)
-					return aux->conteudo.val.variavel.db < aux2->conteudo.val.variavel.db;
+					comp =  aux->conteudo.val.variavel.db < aux2->conteudo.val.variavel.db;
 				if(flag==3)
-					return aux->conteudo.val.variavel.ch < aux2->conteudo.val.variavel.ch;
+					comp =  aux->conteudo.val.variavel.ch < aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) < 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) < 0;
 			} else if(strcmp(op,">=")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
-					return aux->conteudo.val.variavel.in >= aux2->conteudo.val.variavel.in;
+					comp =  aux->conteudo.val.variavel.in >= aux2->conteudo.val.variavel.in;
 				if(flag==1)
-					return aux->conteudo.val.variavel.fl >= aux2->conteudo.val.variavel.fl;
+					comp =  aux->conteudo.val.variavel.fl >= aux2->conteudo.val.variavel.fl;
 				if(flag==2)
-					return aux->conteudo.val.variavel.db >= aux2->conteudo.val.variavel.db;
+					comp =  aux->conteudo.val.variavel.db >= aux2->conteudo.val.variavel.db;
 				if(flag==3)
-					return aux->conteudo.val.variavel.ch >= aux2->conteudo.val.variavel.ch;
+					comp =  aux->conteudo.val.variavel.ch >= aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) >= 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) >= 0;
 			} else if(strcmp(op,"<=")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
-					return aux->conteudo.val.variavel.in <= aux2->conteudo.val.variavel.in;
+					comp =  aux->conteudo.val.variavel.in <= aux2->conteudo.val.variavel.in;
 				if(flag==1)
-					return aux->conteudo.val.variavel.fl <= aux2->conteudo.val.variavel.fl;
+					comp =  aux->conteudo.val.variavel.fl <= aux2->conteudo.val.variavel.fl;
 				if(flag==2)
-					return aux->conteudo.val.variavel.db <= aux2->conteudo.val.variavel.db;
+					comp =  aux->conteudo.val.variavel.db <= aux2->conteudo.val.variavel.db;
 				if(flag==3)
-					return aux->conteudo.val.variavel.ch <= aux2->conteudo.val.variavel.ch;
+					comp =  aux->conteudo.val.variavel.ch <= aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) <= 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) <= 0;
 			} else if(strcmp(op,"==")==0) {
 				flag = aux->conteudo.val.flag;
 				if(flag==0)
-					return aux->conteudo.val.variavel.in == aux2->conteudo.val.variavel.in;
+					comp =  aux->conteudo.val.variavel.in == aux2->conteudo.val.variavel.in;
 				if(flag==1)
-					return aux->conteudo.val.variavel.fl == aux2->conteudo.val.variavel.fl;
+					comp =  aux->conteudo.val.variavel.fl == aux2->conteudo.val.variavel.fl;
 				if(flag==2)
-					return aux->conteudo.val.variavel.db == aux2->conteudo.val.variavel.db;
+					comp =  aux->conteudo.val.variavel.db == aux2->conteudo.val.variavel.db;
 				if(flag==3)
-					return aux->conteudo.val.variavel.ch == aux2->conteudo.val.variavel.ch;
+					comp =  aux->conteudo.val.variavel.ch == aux2->conteudo.val.variavel.ch;
 				if(flag==4)
-					return strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) == 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str, aux2->conteudo.val.variavel.str) == 0;
 			}
 		}
 	} else {
 		if(aux==NULL) {
 			if(aux2==NULL) {
 				if(strcmp(op,"==") == 0) {
-					return strcmp(prim->tokenName,terc->tokenName) == 0;
+					comp =  strcmp(prim->tokenName,terc->tokenName) == 0;
 				} else if(strcmp(op,">") == 0) {
-					return strcmp(prim->tokenName,terc->tokenName) > 0;
+					comp =  strcmp(prim->tokenName,terc->tokenName) > 0;
 				} else if(strcmp(op,"<") == 0) {
-					return strcmp(prim->tokenName,terc->tokenName) < 0;
+					comp =  strcmp(prim->tokenName,terc->tokenName) < 0;
 				} else if(strcmp(op,">=") == 0) {
-					return strcmp(prim->tokenName,terc->tokenName) >= 0;
+					comp =  strcmp(prim->tokenName,terc->tokenName) >= 0;
 				} else if(strcmp(op,"<=") == 0) {
-					return strcmp(prim->tokenName,terc->tokenName) <= 0;
+					comp =  strcmp(prim->tokenName,terc->tokenName) <= 0;
 				}
 
 			} else {
 				flag = aux2->conteudo.val.flag;
 				if(flag == 4) {
 					if(strcmp(op,"==") == 0) {
-						return strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) == 0;
+						comp =  strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) == 0;
 					} else if(strcmp(op,">") == 0) {
-						return strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) > 0;
+						comp =  strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) > 0;
 					} else if(strcmp(op,"<") == 0) {
-						return strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) < 0;
+						comp =  strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) < 0;
 					} else if(strcmp(op,">=") == 0) {
-						return strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) >= 0;
+						comp =  strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) >= 0;
 					} else if(strcmp(op,"<=") == 0) {
-						return strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) <= 0;
+						comp =  strcmp(aux2->conteudo.val.variavel.str,prim->tokenName) <= 0;
 					}
 				} else {
 					if(flag==0) {
 						sprintf(valor,"%d",aux2->conteudo.val.variavel.in);
 						if(strcmp(op,"==") == 0) {
-							return strcmp(valor,prim->tokenName) == 0;
+							comp =  strcmp(valor,prim->tokenName) == 0;
 						} else if(strcmp(op,">") == 0) {
-							return strcmp(valor,prim->tokenName) > 0;
+							comp =  strcmp(valor,prim->tokenName) > 0;
 						} else if(strcmp(op,"<") == 0) {
-							return strcmp(valor,prim->tokenName) < 0;
+							comp =  strcmp(valor,prim->tokenName) < 0;
 						} else if(strcmp(op,">=") == 0) {
-							return strcmp(valor,prim->tokenName) >= 0;
+							comp =  strcmp(valor,prim->tokenName) >= 0;
 						} else if(strcmp(op,"<=") == 0) {
-							return strcmp(valor,prim->tokenName) <= 0;
+							comp =  strcmp(valor,prim->tokenName) <= 0;
 						}
 					} else if(flag ==1) {
 						sprintf(valor,"%f",aux2->conteudo.val.variavel.fl);
 						if(strcmp(op,"==") == 0) {
-							return strcmp(valor,prim->tokenName) == 0;
+							comp =  strcmp(valor,prim->tokenName) == 0;
 						} else if(strcmp(op,">") == 0) {
-							return strcmp(valor,prim->tokenName) > 0;
+							comp =  strcmp(valor,prim->tokenName) > 0;
 						} else if(strcmp(op,"<") == 0) {
-							return strcmp(valor,prim->tokenName) < 0;
+							comp =  strcmp(valor,prim->tokenName) < 0;
 						} else if(strcmp(op,">=") == 0) {
-							return strcmp(valor,prim->tokenName) >= 0;
+							comp =  strcmp(valor,prim->tokenName) >= 0;
 						} else if(strcmp(op,"<=") == 0) {
-							return strcmp(valor,prim->tokenName) <= 0;
+							comp =  strcmp(valor,prim->tokenName) <= 0;
 						}
 					} else if(flag==2) {
 						sprintf(valor,"%lf",aux2->conteudo.val.variavel.db);
 						if(strcmp(op,"==") == 0) {
-							return strcmp(valor,prim->tokenName) == 0;
+							comp =  strcmp(valor,prim->tokenName) == 0;
 						} else if(strcmp(op,">") == 0) {
-							return strcmp(valor,prim->tokenName) > 0;
+							comp =  strcmp(valor,prim->tokenName) > 0;
 						} else if(strcmp(op,"<") == 0) {
-							return strcmp(valor,prim->tokenName) < 0;
+							comp =  strcmp(valor,prim->tokenName) < 0;
 						} else if(strcmp(op,">=") == 0) {
-							return strcmp(valor,prim->tokenName) >= 0;
+							comp =  strcmp(valor,prim->tokenName) >= 0;
 						} else if(strcmp(op,"<=") == 0) {
-							return strcmp(valor,prim->tokenName) <= 0;
+							comp =  strcmp(valor,prim->tokenName) <= 0;
 						}
 					} else if(flag==3) {
 						sprintf(valor,"%c",aux2->conteudo.val.variavel.ch);
 						if(strcmp(op,"==") == 0) {
-							return strcmp(valor,prim->tokenName) == 0;
+							comp =  strcmp(valor,prim->tokenName) == 0;
 						} else if(strcmp(op,">") == 0) {
-							return strcmp(valor,prim->tokenName) > 0;
+							comp =  strcmp(valor,prim->tokenName) > 0;
 						} else if(strcmp(op,"<") == 0) {
-							return strcmp(valor,prim->tokenName) < 0;
+							comp =  strcmp(valor,prim->tokenName) < 0;
 						} else if(strcmp(op,">=") == 0) {
-							return strcmp(valor,prim->tokenName) >= 0;
+							comp =  strcmp(valor,prim->tokenName) >= 0;
 						} else if(strcmp(op,"<=") == 0) {
-							return strcmp(valor,prim->tokenName) <= 0;
+							comp =  strcmp(valor,prim->tokenName) <= 0;
 						}
 					}
 
@@ -230,73 +249,76 @@ int resolveIf(Token *T, Pilha *P) {
 			flag = aux->conteudo.val.flag;
 			if(flag == 4) {
 				if(strcmp(op,"==") == 0) {
-					return strcmp(aux->conteudo.val.variavel.str,terc->tokenName) == 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str,terc->tokenName) == 0;
 				} else if(strcmp(op,">") == 0) {
-					return strcmp(aux->conteudo.val.variavel.str,terc->tokenName) > 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str,terc->tokenName) > 0;
 				} else if(strcmp(op,"<") == 0) {
-					return strcmp(aux->conteudo.val.variavel.str,terc->tokenName) < 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str,terc->tokenName) < 0;
 				} else if(strcmp(op,">=") == 0) {
-					return strcmp(aux->conteudo.val.variavel.str,terc->tokenName) >= 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str,terc->tokenName) >= 0;
 				} else if(strcmp(op,"<=") == 0) {
-					return strcmp(aux->conteudo.val.variavel.str,terc->tokenName) <= 0;
+					comp =  strcmp(aux->conteudo.val.variavel.str,terc->tokenName) <= 0;
 				}
 			} else {
 				if(flag==0) {
 					sprintf(valor,"%d",aux->conteudo.val.variavel.in);
 					if(strcmp(op,"==") == 0) {
-						return strcmp(valor,terc->tokenName) == 0;
+						comp =  strcmp(valor,terc->tokenName) == 0;
 					} else if(strcmp(op,">") == 0) {
-						return strcmp(valor,terc->tokenName) > 0;
+						comp =  strcmp(valor,terc->tokenName) > 0;
 					} else if(strcmp(op,"<") == 0) {
-						return strcmp(valor,terc->tokenName) < 0;
+						comp =  strcmp(valor,terc->tokenName) < 0;
 					} else if(strcmp(op,">=") == 0) {
-						return strcmp(valor,terc->tokenName) >= 0;
+						comp =  strcmp(valor,terc->tokenName) >= 0;
 					} else if(strcmp(op,"<=") == 0) {
-						return strcmp(valor,terc->tokenName) <= 0;
+						comp =  strcmp(valor,terc->tokenName) <= 0;
 					}
 				} else if(flag ==1) {
 					sprintf(valor,"%f",aux->conteudo.val.variavel.fl);
 					if(strcmp(op,"==") == 0) {
-						return strcmp(valor,terc->tokenName) == 0;
+						comp =  strcmp(valor,terc->tokenName) == 0;
 					} else if(strcmp(op,">") == 0) {
-						return strcmp(valor,terc->tokenName) > 0;
+						comp =  strcmp(valor,terc->tokenName) > 0;
 					} else if(strcmp(op,"<") == 0) {
-						return strcmp(valor,terc->tokenName) < 0;
+						comp =  strcmp(valor,terc->tokenName) < 0;
 					} else if(strcmp(op,">=") == 0) {
-						return strcmp(valor,terc->tokenName) >= 0;
+						comp =  strcmp(valor,terc->tokenName) >= 0;
 					} else if(strcmp(op,"<=") == 0) {
-						return strcmp(valor,terc->tokenName) <= 0;
+						comp =  strcmp(valor,terc->tokenName) <= 0;
 					}
 				} else if(flag==2) {
 					sprintf(valor,"%lf",aux->conteudo.val.variavel.db);
 					if(strcmp(op,"==") == 0) {
-						return strcmp(valor,terc->tokenName) == 0;
+						comp =  strcmp(valor,terc->tokenName) == 0;
 					} else if(strcmp(op,">") == 0) {
-						return strcmp(valor,terc->tokenName) > 0;
+						comp =  strcmp(valor,terc->tokenName) > 0;
 					} else if(strcmp(op,"<") == 0) {
-						return strcmp(valor,terc->tokenName) < 0;
+						comp =  strcmp(valor,terc->tokenName) < 0;
 					} else if(strcmp(op,">=") == 0) {
-						return strcmp(valor,terc->tokenName) >= 0;
+						comp =  strcmp(valor,terc->tokenName) >= 0;
 					} else if(strcmp(op,"<=") == 0) {
-						return strcmp(valor,terc->tokenName) <= 0;
+						comp =  strcmp(valor,terc->tokenName) <= 0;
 					}
 				} else if(flag==3) {
 					sprintf(valor,"%c",aux->conteudo.val.variavel.ch);
 					if(strcmp(op,"==") == 0) {
-						return strcmp(valor,terc->tokenName) == 0;
+						comp =  strcmp(valor,terc->tokenName) == 0;
 					} else if(strcmp(op,">") == 0) {
-						return strcmp(valor,terc->tokenName) > 0;
+						comp =  strcmp(valor,terc->tokenName) > 0;
 					} else if(strcmp(op,"<") == 0) {
-						return strcmp(valor,terc->tokenName) < 0;
+						comp =  strcmp(valor,terc->tokenName) < 0;
 					} else if(strcmp(op,">=") == 0) {
-						return strcmp(valor,terc->tokenName) >= 0;
+						comp =  strcmp(valor,terc->tokenName) >= 0;
 					} else if(strcmp(op,"<=") == 0) {
-						return strcmp(valor,terc->tokenName) <= 0;
+						comp =  strcmp(valor,terc->tokenName) <= 0;
 					}
 				}
 			}
 		}
 	}
+	free(aux);
+	free(aux2);
+	return comp;
 }
 
 // Funcão de teste de exibição de funções

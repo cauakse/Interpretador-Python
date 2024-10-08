@@ -79,7 +79,7 @@ void LigaCursor (void) {
 }
 
 void Dimensao (void) {
-	system("mode con cols=120 lines=145");
+	system("mode con cols=120 lines=45");
 }
 
 void Fundo (int Cor) {
@@ -111,6 +111,15 @@ void LimpaTelaMem (void) {
 	for(i=15;i<41;i++) {
 		gotoxy(46,i);
 		printf("                                                                        ");
+	}
+}
+
+void LimpaPrint (void) {
+	int i;
+	
+	for(i=10;i<16;i++) {
+		gotoxy(20,i);
+		printf("                                                                                          ");
 	}
 }
 

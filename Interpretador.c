@@ -8,7 +8,6 @@
 #include "Headers\\ListaToken.h"
 #include "Headers\\PilhaVar.h"
 #include "Headers\\Moldura.h"
-#include "Headers\\FuncoesPy.h"
 #include "Headers\\Funcoes.h"
 #include "Headers\\TADListaGen.h"
 #include "Headers\\TadListaGenContas.h"
@@ -123,7 +122,6 @@ void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 				}
 			break;
 		case 2://caso for função do cabra
-			EscrMsg("opa2");
 			break;
 		case 3://caso função do sistema
 			if(strcmp(Tok->tokenName,"if")==0)
@@ -135,11 +133,7 @@ void Executa(Token *Tok, Pilha **pVar, Funcoes *Funcoes) {
 			if(strcmp(Tok->tokenName,"do")==0)
 				break;
 			break;
-		case 4://caso for print
-			EscrMsg("opa4");
-			break;
 		case 5: //implementação futura
-			EscrMsg("opa5");
 			break;
 		case 0://definição de função
 			break;
@@ -328,10 +322,11 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 			}
 		}
 		EscrMsg("");
-		Moldura(40,10,90,16,9,0);
-		Moldura(41,11,89,13,9,0);
+		LimpaPrint();
+		Moldura(20,10,110,16,9,0);
+		Moldura(21,11,109,13,9,0);
 		ExibirTexto((char*)"RESULTADO DO PRINT",53,12,14);
-		gotoxy(42,14);
+		gotoxy(22,14);
 		printf("%s",string);
 		textcolor(15);
 		getch();
@@ -341,6 +336,7 @@ void ExibirPrint(Token *token, Pilha *pilhaVar) {
 void ExecPassos (List *L) {
 	char op;
 	int LinhaAtual = 0;
+	Token *ant = NULL;
 	List *Linhas = L;
 	Pilha *pilhaDeVariaveis = NULL; // Definindo a pilha de variaveis vazia
 	Funcoes *functions;
@@ -356,6 +352,7 @@ void ExecPassos (List *L) {
 		ExibirPrograma(Linhas,LinhaAtual); // Exibe o conteúdo do arquivo com efeito na linha atual .py
 		LimpaMsg();
 		EscrMsg((char*)"[ENTER] - PROXIMA LINHA, [F9] - CONTEUDO MEM. RAM, [F10] - EXIBIR RESULTADOS OU [ESC] PARA VOLTAR");
+
 		Executa(L->pToken,&pilhaDeVariaveis,functions);// Executa a linha e atualiza a pilha de variáveis com resultados.
 
 		op = getch();
@@ -383,6 +380,38 @@ void ExecPassos (List *L) {
 					// Tokens que não são Linhas de Código.
 					if(!strcmp(L->pToken->tokenName,"fimdef") || !strcmp(L->pToken->tokenName,"fim"))
 						L = L->prox;
+					if(!strcmp(L->pToken->tokenName,"if")) {
+						if(resolveIf(L->pToken,pilhaDeVariaveis) == 1) {
+							ant = L->pToken;
+							L = L->prox;
+							LinhaAtual++;
+						} else {
+							while(L && strcmp(L->pToken->tokenName,"fim")) {
+								L = L->prox;
+								LinhaAtual++;
+							}
+							if(!strcmp(L->pToken->tokenName,"fim")) {
+								L = L->prox;
+								if(!strcmp(L->pToken->tokenName,"else")) {
+									L = L->prox;
+									LinhaAtual++;
+								}
+							}
+						}
+					}
+					if(!strcmp(L->pToken->tokenName,"else")) {
+						printf("else");
+						getch();
+						if(ant) {
+							ant = NULL;
+							while(L && strcmp(L->pToken->tokenName,"fim")) {
+								L = L->prox;
+								LinhaAtual++;
+							}
+							if(!strcmp(L->pToken->tokenName,"fim"))
+								L = L->prox;
+						}
+					}
 				} else
 					op=27;
 		}
@@ -394,7 +423,7 @@ void AbrirArquivo (List **L) {
 	char op, arquivo[100];
 	int i=0;
 
-	/*LigaCursor();
+	LigaCursor();
 	Moldura(40,10,90,16,9,0);
 	Moldura(41,11,89,13,9,0);
 	ExibirTexto((char*)"DIGITE O NOME DO ARQUIVO",53,12,14);
@@ -403,8 +432,7 @@ void AbrirArquivo (List **L) {
 	gets(arquivo);
 	RetiraCursor();
 
-	/*arq = fopen(arquivo,"r");
-	*/arq = fopen("teste.py","r");
+	arq = fopen(arquivo,"r");
 
 	LimpaMsg();
 	if(!arq) {
